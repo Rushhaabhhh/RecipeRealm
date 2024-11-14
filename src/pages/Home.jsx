@@ -2,11 +2,19 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import SearchInput from '../components/SearchInput';
 import RecipeCard from '../components/RecipeCard';
+import Filter from '../components/Filter';
 import useRecipes from '../hooks/useRecipes';
 
 const Home = () => {
   const [query, setQuery] = useState('');
-  const { data: recipes, isLoading, error } = useRecipes(query);
+  const [diet, setDiet] = useState('');
+  const [cuisine, setCuisine] = useState('');
+  const [page, setPage] = useState(1);
+
+  const { data: recipes, isLoading, error } = useRecipes(query, diet, cuisine, page);
+
+  const handleNextPage = () => setPage((prev) => prev + 1);
+  const handlePrevPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -20,7 +28,7 @@ const Home = () => {
           >
             Recipe Realm
           </motion.h2>
-          <ul className="flex space-x-6 text-lg text-gray-700 mx-auto cursor-pointer">
+          <ul className="flex space-x-6 text-lg text-gray-700 cursor-pointer">
             <li>Home</li>
             <li><a href="/recipe/1">Recipes</a></li>
             <li>About</li>
@@ -48,6 +56,31 @@ const Home = () => {
           <SearchInput onSearch={setQuery} />
         </motion.div>
 
+        {/* Filters */}
+        <div className="flex flex-wrap justify-center gap-4 mt-4">
+          <Filter 
+            label="Diet" 
+            options={[
+              { value: '', label: 'All' },
+              { value: 'vegetarian', label: 'Vegetarian' },
+              { value: 'vegan', label: 'Vegan' },
+              { value: 'gluten-free', label: 'Gluten-Free' },
+            ]} 
+            onChange={setDiet} 
+          />
+          <Filter 
+            label="Cuisine" 
+            options={[
+              { value: '', label: 'All' },
+              { value: 'italian', label: 'Italian' },
+              { value: 'mexican', label: 'Mexican' },
+              { value: 'indian', label: 'Indian' },
+            ]} 
+            onChange={setCuisine} 
+          />
+        </div>
+
+        {/* Loading and Error Messages */}
         {isLoading && (
           <motion.p 
             initial={{ opacity: 0 }}
@@ -67,6 +100,7 @@ const Home = () => {
           </motion.p>
         )}
 
+        {/* Recipe List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           {recipes?.results.map((recipe) => (
             <motion.div
@@ -78,6 +112,24 @@ const Home = () => {
               <RecipeCard recipe={recipe} />
             </motion.div>
           ))}
+        </div>
+
+        {/* Pagination */}
+        <div className="flex justify-center mt-8 space-x-4">
+          <button 
+            onClick={handlePrevPage} 
+            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span className="text-gray-700">Page {page}</span>
+          <button 
+            onClick={handleNextPage} 
+            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+          >
+            Next
+          </button>
         </div>
       </div>
 

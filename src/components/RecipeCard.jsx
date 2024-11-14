@@ -1,7 +1,10 @@
 import React from 'react';
 
-const RecipeCard = ({ recipe }) => (
-  <div className="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300">
+const RecipeCard = ({ recipe, onSelect }) => (
+  <div 
+    className="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 cursor-pointer"
+    onClick={() => onSelect(recipe.id)}
+  >
     <img src={recipe.image} alt={recipe.title} className="w-full h-40 object-cover" />
     <div className="p-4">
       <h3 className="text-lg font-semibold text-gray-800">{recipe.title}</h3>
